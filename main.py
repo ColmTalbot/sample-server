@@ -6,7 +6,7 @@ from fastapi import FastAPI, HTTPException, Request, Query
 from fastapi.middleware.gzip import GZipMiddleware
 from pydantic import BaseModel
 
-from load_samples import load_samples, find_variables
+from load_event_samples import load_samples, find_variables
 
 app = FastAPI()
 
