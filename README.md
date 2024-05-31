@@ -26,7 +26,7 @@ class Client:
 
     _cache = dict()
 
-    def __init__(self, host="https://gwsamples.duckdns.org/events"):
+    def __init__(self, host="https://gwsamples.duckdns.org"):
         self.host = host
 
     @classmethod
@@ -35,7 +35,7 @@ class Client:
 
     @cache
     def events(self):
-        return requests.get(self.host).json()
+        return requests.get(f"{self.host}/events").json()
 
     def samples(self, event, parameters, n_samples=-1, model="C01:IMRPhenomXPHM"):
         hash_ = f"{event}-{'&'.join(parameters)}-{n_samples}-{model}"
@@ -51,7 +51,7 @@ class Client:
 
     def get_samples(self, event, parameters, n_samples=-1, model="C01:IMRPhenomXPHM"):
         var = "&".join([f"variable={par}" for par in parameters])
-        request = f"{self.host}/{event}?n_samples={n_samples}&{var}"
+        request = f"{self.host}/events/{event}/?n_samples={n_samples}&{var}"
         result = requests.get(request, verify=True)
         if result.status_code == 502:
             # retry on timeout error
