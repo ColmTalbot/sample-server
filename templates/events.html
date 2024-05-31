@@ -1,0 +1,38 @@
+<html>
+<head>
+    <title>Item Details</title>
+</head>
+<body>
+    <form autocomplete="on">
+      <!-- <label for="variable">Variables (comma separated):</label><br>
+      <input type="text" id="variable" name="variable" value=""><br> -->
+      <label for="n_samples">Number of samples:</label><br>
+      <input type="text" id="n_samples" name="n_samples" value="-1"><br><br>
+      <label for="model">Waveform model:</label><br>
+      <input type="text" id="model" name="model" value="C01:IMRPhenomXPHM"><br><br>
+    <!--</form>
+    Available parameters are:
+    <form>-->
+      <label for="variable">Variables (choose multiple):</label><br>
+      <select name="variable" multiple>
+    {% for variable in variables|sort %}
+        <option value="{{ variable }}">{{ variable }}</option>
+        <!--<input type="checkbox" id="{{ variable }}" name="variable" value="{{ variable }}">
+	<label for="{{ variable }}"> {{ variable  }}</label><br>-->
+    {% endfor %}
+      </select><br><br>
+      <label for="event">Events (choose multiple):</label><br>
+      <select name="event" multiple>
+    {% for event in events|sort %}
+        <option value="{{ event }}">{{ event }}</option>
+    {% endfor %}
+      </select><br><br>
+    <input type="submit" value="Submit">
+    </form>
+    <ul>
+    {% for event in events|sort %}
+    	<li><a href="{{ url_for('read_samples', event=event) }}">{{ event }}</a></li>
+    {% endfor %}
+    </ul>
+</body>
+</html>
