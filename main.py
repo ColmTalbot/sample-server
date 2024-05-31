@@ -12,8 +12,6 @@ app = FastAPI()
 
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
-result_dir = Path("/home/sample-user/samples")
-
 
 class SampleDict(BaseModel):
     model: str
@@ -21,15 +19,21 @@ class SampleDict(BaseModel):
     samples: dict[str, list[float]]
 
 
-EVENTS = [
-    re.findall(r"GW[\d]{6}_[\d]+", str(fname))[0]
-    for fname in result_dir.iterdir() if "GW" in str(fname)
-]
+SAMPLEDIR = Path("/home/sample-user/samples")
+EVENT_FILENAMES = dict()
+for sample_set in (SAMPLEDIR / "events").iterdir():
+    for fname in sample_set.iterdir():
+        name = re.findall(r"GW[\d]{6}_[\d]+", str(fname))[0]
+        EVENT_FILENAMES[name] = fname
+EVENTS = list(EVENT_FILENAMES.keys())
 EVENTS.sort()
-FILENAMES = {
-    str(re.findall(r"GW[\d]{6}_[\d]+", str(fname))[0]): fname
-    for fname in result_dir.iterdir() if "GW" in str(fname)
-}
+INJECTION_FILENAMES = dict()
+for sample_set in (SAMPLEDIR / "injections").iterdir():
+    for fname in sample_set.iterdir():
+        name = fname.name.split("-")
+        INJECTION_FILENAMES[name] = fname
+INJECTION_FILES = list(INJECTION_FILENAMES.keys())
+INJECTION_FILENAMES.sort()
 
 
 @app.get("/events")
@@ -46,7 +50,7 @@ async def read_samples(
     model: str = "C01:IMRPhenomXPHM",
     seed: int | None = None,
 ) -> SampleDict | list[str]:
-    filename = FILENAMES.get(event, None)
+    filename = EVENT_FILENAMES.get(event, None)
 
     if filename is None:
         raise HTTPException(
@@ -54,7 +58,7 @@ async def read_samples(
             detail=(
                 f"Sample file {filename} for {event} not found. "
                 f"Available values are {', '.join(EVENTS)}. "
-                f"{FILENAMES}",
+                f"{EVENT_FILENAMES}",
             ),
         )
 
@@ -80,7 +84,7 @@ async def _read_samples(
     if filename is None:
         raise HTTPException(
             status_code=404,
-            detail=f"Unknown file {filename}: {', '.join(FILENAMES.keys())}",
+            detail=f"Unknown file {filename}: {', '.join(EVENT_FILENAMES.keys())}",
         )
     try:
         data = await load_samples(
@@ -96,3 +100,6 @@ async def _read_samples(
     return data
 
 
+@app.get("/injections")
+async def list_events(request: Request) -> list[str]:
+    return INJECTION_FILENAMES
