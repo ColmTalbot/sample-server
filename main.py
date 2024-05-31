@@ -22,6 +22,8 @@ class SampleDict(BaseModel):
 SAMPLEDIR = Path("/home/sample-user/samples")
 EVENT_FILENAMES = dict()
 for sample_set in (SAMPLEDIR / "events").iterdir():
+    if not sample_set.is_dir():
+        continue
     for fname in sample_set.iterdir():
         name = re.findall(r"GW[\d]{6}_[\d]+", str(fname))[0]
         EVENT_FILENAMES[name] = fname
@@ -29,11 +31,13 @@ EVENTS = list(EVENT_FILENAMES.keys())
 EVENTS.sort()
 INJECTION_FILENAMES = dict()
 for sample_set in (SAMPLEDIR / "injections").iterdir():
+    if not sample_set.is_dir():
+        continue
     for fname in sample_set.iterdir():
-        name = fname.name.split("-")
+        name = fname.name.split("-")[0]
         INJECTION_FILENAMES[name] = fname
 INJECTION_FILES = list(INJECTION_FILENAMES.keys())
-INJECTION_FILENAMES.sort()
+INJECTION_FILES.sort()
 
 
 @app.get("/events")
@@ -102,4 +106,4 @@ async def _read_samples(
 
 @app.get("/injections")
 async def list_events(request: Request) -> list[str]:
-    return INJECTION_FILENAMES
+    return INJECTION_FILES
