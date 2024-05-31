@@ -25,6 +25,7 @@ EVENTS = [
     re.findall(r"GW[\d]{6}_[\d]+", str(fname))[0]
     for fname in result_dir.iterdir() if "GW" in str(fname)
 ]
+EVENTS.sort()
 FILENAMES = {
     str(re.findall(r"GW[\d]{6}_[\d]+", str(fname))[0]): fname
     for fname in result_dir.iterdir() if "GW" in str(fname)
