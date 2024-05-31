@@ -11,6 +11,12 @@ async def load_samples(
 ):
     output = dict()
     with h5py.File(filename, "r") as ff:
+        if model not in ff:
+            raise KeyError(
+                f"Model {model} not present in {filename}. "
+                f"Available models are {', '.join(ff.keys())}"
+            )
+
         data = ff[model]["posterior_samples"]
 
         total_n_samples = len(data)
