@@ -71,7 +71,7 @@ async def read_samples(
     if variable is None:
         return find_variables(filename, model)
 
-    return await _read_samples(
+    samples = await _read_samples(
         filename=filename,
         read_func=load_samples,
         model=model,
@@ -79,6 +79,7 @@ async def read_samples(
         n_samples=n_samples,
         seed=seed,
     )
+    return SampleDict(**samples)
 
 
 @app.get("/injections")
@@ -110,7 +111,7 @@ async def read_injections(
     if variable is None:
         return find_variables(filename, "injections")
 
-    return await _read_samples(
+    injs = await _read_samples(
         filename=filename,
         read_func=load_injections,
         ifar_threshold=ifar_threshold,
@@ -118,6 +119,8 @@ async def read_injections(
         n_samples=n_samples,
         seed=seed,
     )
+    output = SampleDict(**injs)
+    return output
 
 
 async def _read_samples(

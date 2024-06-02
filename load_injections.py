@@ -19,8 +19,8 @@ def load_injections(
         
         data = ff["injections"]
 
-        output["metadata"]["analysis_time"] = data.attrs["analysis_time_s"] / YEAR
-        output["metadata"]["total_generated"] = data.attrs["total_generated"]
+        output["metadata"]["analysis_time"] = float(data.attrs["analysis_time_s"] / YEAR)
+        output["metadata"]["total_generated"] = float(data.attrs["total_generated"])
 
         keep = np.zeros(len(data["sampling_pdf"]), dtype=bool)
         for key in data:
@@ -28,24 +28,24 @@ def load_injections(
                 keep |= data[key][()] > ifar_threshold
 
         total_n_samples = sum(keep)
-        output["metadata"]["n_found"] = total_n_samples
+        output["metadata"]["n_found"] = int(total_n_samples)
         if n_samples > total_n_samples:
             raise ValueError(
                 f"Insufficient found injections available in {filename}. "
                 f"{n_samples} requested and {total_n_samples} available."
             )
         elif n_samples == -1:
-            idxs = keep
+            idxs = np.arange(len(keep))[keep]
         else:
             rng = np.random.default_rng(seed)
             idxs = rng.choice(np.where(keep)[0], n_samples, replace=False)
             idxs = np.sort(idxs)
 
-        output["idxs"] = list(idxs)
+        output["idxs"] = idxs.tolist()
         output["samples"] = dict()
         for variable in variables:
             try:
-                output["samples"][variable] = list(data[variable][()][idxs])
+                output["samples"][variable] = data[variable][()][idxs].tolist()
             except ValueError:
                 raise KeyError(
                     f"Variable {variable} not found in the injections. "

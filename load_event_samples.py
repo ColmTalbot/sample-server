@@ -31,11 +31,11 @@ def load_samples(
             rng = np.random.default_rng(seed)
             idxs = rng.choice(total_n_samples, n_samples, replace=False)
 
-        output["idxs"] = list(idxs)
+        output["idxs"] = idxs.tolist()
         output["samples"] = dict()
         for variable in variables:
             try:
-                output["samples"][variable] = list(data[variable][()][idxs])
+                output["samples"][variable] = data[variable][()][idxs].tolist()
             except ValueError:
                 raise KeyError(
                     f"Variable {variable} not found in the posterior samples. "
