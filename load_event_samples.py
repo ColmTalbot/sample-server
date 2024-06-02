@@ -2,7 +2,7 @@ import h5py
 import numpy as np
 
 
-async def load_samples(
+def load_samples(
     filename: str,
     model: str,
     variables: list[str],
@@ -42,11 +42,16 @@ async def load_samples(
                     f"Available variables are: {data.dtype}"
                 )
     output["model"] = model
+    output["metadata"] = dict(filename=filename.name)
     return output
 
 
 def find_variables(filename, model):
     with h5py.File(filename, "r") as ff:
-        data = ff[model]["posterior_samples"]
-        return data.dtype.names
-
+        if hasattr(ff[model], "posterior_samples"):
+            data = ff[model]["posterior_samples"]
+            return data.dtype.names
+        else:
+            data = ff[model]
+            return list(data.keys())
+        

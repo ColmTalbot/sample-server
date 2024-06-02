@@ -7,6 +7,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from pydantic import BaseModel
 
 from load_event_samples import load_samples, find_variables
+from load_injections import load_injections
 
 app = FastAPI()
 
@@ -17,6 +18,7 @@ class SampleDict(BaseModel):
     model: str
     idxs: list[int]
     samples: dict[str, list[float]]
+    metadata: dict[str, int | float | str]
 
 
 SAMPLEDIR = Path("/home/sample-user/samples")
@@ -71,7 +73,47 @@ async def read_samples(
 
     return await _read_samples(
         filename=filename,
+        read_func=load_samples,
         model=model,
+        variables=variable,
+        n_samples=n_samples,
+        seed=seed,
+    )
+
+
+@app.get("/injections")
+async def list_injection_sets(request: Request) -> list[str]:
+    return INJECTION_FILES
+
+
+@app.get("/injections/{injection_set}/")
+async def read_injections(
+    request: Request,
+    injection_set: str,
+    variable: Annotated[list[str] | None, Query()] = None,
+    n_samples: int = -1,
+    ifar_threshold: float = 1,
+    seed: int | None = None,
+) -> SampleDict | list[str]:
+    filename = INJECTION_FILENAMES.get(injection_set, None)
+
+    if filename is None:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"Sample file {filename} for {injection_set} not found. "
+                f"Available values are {', '.join(EVENTS)}. "
+                f"{EVENT_FILENAMES}",
+            ),
+        )
+
+    if variable is None:
+        return find_variables(filename, "injections")
+
+    return await _read_samples(
+        filename=filename,
+        read_func=load_injections,
+        ifar_threshold=ifar_threshold,
         variables=variable,
         n_samples=n_samples,
         seed=seed,
@@ -80,30 +122,17 @@ async def read_samples(
 
 async def _read_samples(
     filename: Path | None,
-    variables: list[str],
-    n_samples: int = -1,
-    model: str = "C01:IMRPhenomXPHM",
-    seed: int | None = None,
-):
+    read_func: callable,
+    **kwargs,
+) -> SampleDict:
     if filename is None:
         raise HTTPException(
             status_code=404,
             detail=f"Unknown file {filename}: {', '.join(EVENT_FILENAMES.keys())}",
         )
     try:
-        data = await load_samples(
-            filename=filename,
-            model=model,
-            variables=variables,
-            n_samples=n_samples,
-            seed=seed,
-        )
+        data = read_func(filename=filename, **kwargs)
     except (ValueError, KeyError) as e:
         raise HTTPException(status_code=404, detail=str(e).strip('"'))
 
     return data
-
-
-@app.get("/injections")
-async def list_events(request: Request) -> list[str]:
-    return INJECTION_FILES
