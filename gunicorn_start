@@ -18,6 +18,7 @@ exec gunicorn main:app \
   --workers $WORKERS \
   --worker-class $WORKER_CLASS \
   --user=$USER \
+  --timeout=60 \
   --group=$GROUP \
   --bind=$BIND \
   --log-level=$LOG_LEVEL \

@@ -45,7 +45,7 @@ def load_injections(
         output["samples"] = dict()
         for variable in variables:
             try:
-                output["samples"][variable] = list(data[variable][idxs])
+                output["samples"][variable] = list(data[variable][()][idxs])
             except ValueError:
                 raise KeyError(
                     f"Variable {variable} not found in the injections. "
