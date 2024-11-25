@@ -1,3 +1,4 @@
+import os
 import re
 from pathlib import Path
 from typing import Annotated
@@ -21,7 +22,7 @@ class SampleDict(BaseModel):
     metadata: dict[str, int | float | str]
 
 
-SAMPLEDIR = Path("/home/sample-user/samples")
+SAMPLEDIR = Path(os.environ.get("SAMPLEDIR", "/home/sample-user/samples"))
 EVENT_FILENAMES = dict()
 for sample_set in (SAMPLEDIR / "events").iterdir():
     if not sample_set.is_dir():
