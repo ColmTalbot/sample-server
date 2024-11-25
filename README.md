@@ -1,7 +1,7 @@
 # sample-server
 
 A basic `FastAPI` API for serving posterior samples for gravitational-wave observations.
-The setup assumes that there is a directly containing HDF5 files downloaded from zenodo [here](https://zenodo.org/records/5546663) and [here](https://zenodo.org/records/6513631).
+The setup assumes that there is a directly containing HDF5 files downloaded from zenodo [here](https://zenodo.org/records/5546663) and [here](https://zenodo.org/records/6513631) and released under CC Attribution by the LIGO Scientific Collaboration and Virgo Collaboration and KAGRA Collaboration.
 
 The specifiable quantities are:
 
