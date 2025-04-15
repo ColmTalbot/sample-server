@@ -22,9 +22,9 @@ class SampleDict(BaseModel):
     metadata: dict[str, int | float | str]
 
 
-SAMPLEDIR = Path(os.environ.get("SAMPLEDIR", "/home/sample-user/samples"))
+SAMPLEDIR = Path(os.environ.get("SAMPLEDIR", "/home/sample-user/samples/events"))
 EVENT_FILENAMES = dict()
-for sample_set in (SAMPLEDIR / "events").iterdir():
+for sample_set in SAMPLEDIR.iterdir():
     if not sample_set.is_dir():
         continue
     for fname in sample_set.iterdir():
@@ -33,7 +33,8 @@ for sample_set in (SAMPLEDIR / "events").iterdir():
 EVENTS = list(EVENT_FILENAMES.keys())
 EVENTS.sort()
 INJECTION_FILENAMES = dict()
-for sample_set in (SAMPLEDIR / "injections").iterdir():
+INJECTIONDIR = Path(os.environ.get("INJECTIONDIR", "/home/sample-user/samples/events/injections"))
+for sample_set in SAMPLEDIR.iterdir():
     if not sample_set.is_dir():
         continue
     for fname in sample_set.iterdir():

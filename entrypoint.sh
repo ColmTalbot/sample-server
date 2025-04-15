@@ -10,6 +10,8 @@ LOG_LEVEL=${LOG_LEVEL:-info}
 ACCESS_LOG=${ACCESS_LOG:--}
 ERROR_LOG=${ERROR_LOG:--}
 
+cd /app
+
 echo "Starting Gunicorn with:"
 echo "  app: $APP_MODULE"
 echo "  workers: $WORKERS"
