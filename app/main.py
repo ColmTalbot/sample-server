@@ -33,7 +33,7 @@ for sample_set in SAMPLEDIR.iterdir():
 EVENTS = list(EVENT_FILENAMES.keys())
 EVENTS.sort()
 INJECTION_FILENAMES = dict()
-INJECTIONDIR = Path(os.environ.get("INJECTIONDIR", "/home/sample-user/samples/events/injections"))
+INJECTIONDIR = Path(os.environ.get("INJECTIONDIR", "/home/sample-user/samples/injections"))
 for sample_set in SAMPLEDIR.iterdir():
     if not sample_set.is_dir():
         continue
