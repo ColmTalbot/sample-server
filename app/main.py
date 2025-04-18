@@ -21,8 +21,9 @@ class SampleDict(BaseModel):
     samples: dict[str, list[float]]
     metadata: dict[str, int | float | str]
 
+
 ALLOWED_EXTENSIONS = [".h5", ".hdf5"]
-SAMPLEDIR = Path(os.environ.get("SAMPLEDIR", "/home/sample-user/samples/events"))
+SAMPLEDIR = Path(os.environ.get("SAMPLEDIR", "/events"))
 EVENT_FILENAMES = dict()
 for sample_set in SAMPLEDIR.iterdir():
     if not sample_set.is_dir():
@@ -35,7 +36,7 @@ for sample_set in SAMPLEDIR.iterdir():
 EVENTS = list(EVENT_FILENAMES.keys())
 EVENTS.sort()
 INJECTION_FILENAMES = dict()
-INJECTIONDIR = Path(os.environ.get("INJECTIONDIR", "/home/sample-user/samples/injections"))
+INJECTIONDIR = Path(os.environ.get("INJECTIONDIR", "/injections"))
 for sample_set in INJECTIONDIR.iterdir():
     if not sample_set.is_dir():
         continue
