@@ -34,7 +34,7 @@ EVENTS = list(EVENT_FILENAMES.keys())
 EVENTS.sort()
 INJECTION_FILENAMES = dict()
 INJECTIONDIR = Path(os.environ.get("INJECTIONDIR", "/home/sample-user/samples/injections"))
-for sample_set in SAMPLEDIR.iterdir():
+for sample_set in INJECTIONDIR.iterdir():
     if not sample_set.is_dir():
         continue
     for fname in sample_set.iterdir():
