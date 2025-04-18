@@ -1,5 +1,7 @@
 # sample-server
 
+**This case is very much under development and may change rapidly.**
+
 A basic `FastAPI` API for serving posterior samples for gravitational-wave observations.
 The setup assumes that there is a directly containing HDF5 files downloaded from zenodo [here](https://zenodo.org/records/5546663) and [here](https://zenodo.org/records/6513631) and released under CC Attribution by the LIGO Scientific Collaboration and Virgo Collaboration and KAGRA Collaboration.
 
@@ -96,24 +98,23 @@ The important features are:
 While samples can be queried using raw HTTP requests, the recommended method is via the companion Python library [`gwsamplefind`](https://github.com/ColmTalbot/gwsamplefind) with example usage
 
 ```python
-In [1]: from gwsamplefind.gwsamplefind import Client
-client
+In [1]: from gwsamplefind.client import Client
+
 In [2]: client = Client("https://gwsamples.duckdns.org")
 
 In [3]: client.events()[:3]
-Out[3]: ['GW150914_095045', 'GW190403_051519', 'GW191204_171526']
+Out[3]: ['GW150914_095045', 'GW151012_095443', 'GW151226_033853']
 
-In [4]: client.samples("GW190403_051519", ["mass_1_source", "mass_2_source"], 10)
-Out[4]: 
-      mass_1_source  mass_2_source
-9044      90.116100      15.778448
-8764     101.865908      14.861801
-3839     102.162218      13.492650
-3913     107.222567      11.312127
-801      112.729088      14.255726
-6711     107.521088      20.129922
-1471      83.982683      17.721773
-4016      88.207093      26.552301
-7884     110.588766      15.175171
-1039      86.934782      10.078412
+In [4]: client.samples("GW190403_051519", ["mass_1_source", "mass_2_source"], 10, seed=123)
+Out[4]: (       mass_1_source  mass_2_source
+171        84.189941      12.951107
+10120      65.196794      39.803265
+2453       93.339017      13.003137
+3715       90.226224      18.606987
+7594       58.999799      30.350026
+6600       77.465397      28.502002
+2840       77.523519      21.019240
+1959      106.907594      11.683538
+2053       95.548452      26.507532
+599        71.564036      25.451262, {'filename': 'IGWN-GWTC2p1-v2-GW190403_051519_PEDataRelease_mixed_cosmo.h5', 'model': 'C01:IMRPhenomXPHM'})
 ```
