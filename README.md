@@ -11,66 +11,94 @@ The specifiable quantities are:
 - the number of samples to read.
 - a random seed for reproducibility of which samples are taken.
 
-## Usage
+## Deployment
 
-A basic `Python` client to read the samples is below
+The container builds directly in the GitHub CI and can be deployed from there an example deployment is
 
-```python
-import requests
-from functools import cache
-
-import pandas as pd
-
-
-class Client:
-
-    _cache = dict()
-
-    def __init__(self, host="https://gwsamples.duckdns.org"):
-        self.host = host
-
-    @classmethod
-    def clear_cache(cls):
-        cls._cache = dict()
-
-    @cache
-    def events(self):
-        return requests.get(f"{self.host}/events").json()
-
-    def samples(self, event, parameters, n_samples=-1, model="C01:IMRPhenomXPHM"):
-        hash_ = f"{event}-{'&'.join(parameters)}-{n_samples}-{model}"
-        if self._cache.get(hash_, None) is None:
-            samples = self.get_samples(
-                event=event,
-                parameters=parameters,
-                n_samples=n_samples,
-                model=model,
-            )
-            self._cache[hash_] = samples
-        return self._cache[hash_]
-
-    def get_samples(self, event, parameters, n_samples=-1, model="C01:IMRPhenomXPHM"):
-        var = "&".join([f"variable={par}" for par in parameters])
-        request = f"{self.host}/events/{event}/?n_samples={n_samples}&{var}"
-        result = requests.get(request, verify=True)
-        if result.status_code == 502:
-            # retry on timeout error
-            result = requests.get(request, verify=True)
-
-        if result.status_code != 200:
-            print(result.content, event)
-            return None
-        data = result.json()
-        posteriors = pd.DataFrame(data["samples"], index=data["idxs"])
-        return posteriors
+```console
+$ docker run -it --rm --env-file .env.prod -p 8080:8000 --platform=linux/amd64 -v {EVENT_SAMPLE_DIRECTORY}:/events -v {INJECTION_DIRECTORY}:/injections ghcr.io/colmtalbot/sample-server:latest
 ```
 
-with example usage
+### Environment specification
+
+An example development configuration is
+
+```
+APP_MODULE=main:app
+WORKERS=1
+BIND=0.0.0.0:8000
+TIMEOUT=60
+LOG_LEVEL=debug
+ACCESS_LOG=-
+ERROR_LOG=-
+```
+
+and to deploy with Nginx
+
+```
+APP_MODULE=main:app
+WORKERS=4
+BIND=unix:/tmp/gunicorn.sock
+TIMEOUT=60
+LOG_LEVEL=error
+ACCESS_LOG=/var/log/gunicorn-access.log
+ERROR_LOG=/var/log/gunicorn-error.log
+```
+
+This also requires mounting the `/tmp` and `/var/log` directories.
+
+### Building container locally
+
+```console
+$ docker build --tag sample-server:latest
+```
+
+### Finding data
+
+The data files need to be stored locally on the machine running the server and can be downloaded from zenodo as described above.
+The files should be in the following format
+
+```
+{EVENT_SAMPLE_DIRECTORY}/
+├── GWTC-2.1/
+│   ├── datafile_{GWYYMMDD_SUBDAY}_otherinfo_.h5
+│   ├── datafile_{GWYYMMDD_SUBDAY}_otherinfo_.h5
+│   └── ...
+├── GWTC-3/
+│   ├── datafile_{GWYYMMDD_SUBDAY}_otherinfo_.h5
+│   ├── datafile_{GWYYMMDD_SUBDAY}_otherinfo_.h5
+│   └── ...
+├── OGC-3/
+│   ├── datafile_{GWYYMMDD_SUBDAY}_otherinfo_.h5
+│   ├── datafile_{GWYYMMDD_SUBDAY}_otherinfo_.h5
+│   └── ...
+└── ...
+
+{INJECTION_DIRECTORY}/
+├── LVK-O3-injections/
+│   ├── {LABEL}-otherinfo.hdf5
+│   ├── {LABEL}-otherinfo.hdf5
+│   └── ...
+├── LVK-O4-injections/
+│   ├── {LABEL}-otherinfo.hdf5
+│   ├── {LABEL}-otherinfo.hdf5
+│   └── ...
+└── ...
+```
+
+The important features are:
+- the files must be two levels down from the specified directories.
+- the full GW name for events.
+- the dataset label (followed by hyphen) in the injection sets.
+
+## Usage
+
+While samples can be queried using raw HTTP requests, the recommended method is via the companion Python library [`gwsamplefind`](github.com/ColmTalbot/gwsamplefind) with example usage
 
 ```python
-In [1]: from client import Client
+In [1]: from gwsamplefind.gwsamplefind import Client
 client
-In [2]: client = Client()
+In [2]: client = Client("https://gwsamples.duckdns.org")
 
 In [3]: client.events()[:3]
 Out[3]: ['GW150914_095045', 'GW190403_051519', 'GW191204_171526']
