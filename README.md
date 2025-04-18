@@ -93,7 +93,7 @@ The important features are:
 
 ## Usage
 
-While samples can be queried using raw HTTP requests, the recommended method is via the companion Python library [`gwsamplefind`](github.com/ColmTalbot/gwsamplefind) with example usage
+While samples can be queried using raw HTTP requests, the recommended method is via the companion Python library [`gwsamplefind`](https://github.com/ColmTalbot/gwsamplefind) with example usage
 
 ```python
 In [1]: from gwsamplefind.gwsamplefind import Client
