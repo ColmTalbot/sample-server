@@ -28,7 +28,7 @@ for sample_set in SAMPLEDIR.iterdir():
     if not sample_set.is_dir():
         continue
     for fname in sample_set.iterdir():
-        if not fname.suffix not in ALLOWED_EXTENSIONS:
+        if fname.suffix not in ALLOWED_EXTENSIONS:
             continue
         name = re.findall(r"GW[\d]{6}_[\d]+", str(fname))[0]
         EVENT_FILENAMES[name] = fname
@@ -40,7 +40,7 @@ for sample_set in INJECTIONDIR.iterdir():
     if not sample_set.is_dir():
         continue
     for fname in sample_set.iterdir():
-        if not fname.suffix not in ALLOWED_EXTENSIONS:
+        if fname.suffix not in ALLOWED_EXTENSIONS:
             continue
         name = fname.name.split("-")[0]
         INJECTION_FILENAMES[name] = fname
