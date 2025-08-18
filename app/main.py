@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Annotated
 
 from fastapi import FastAPI, HTTPException, Request, Query
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from pydantic import BaseModel
 
@@ -12,6 +13,7 @@ from load_injections import load_injections
 
 app = FastAPI()
 
+app.add_middleware(CORSMiddleware, allow_origins=["https://colmtalbot.github.io"])
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 
