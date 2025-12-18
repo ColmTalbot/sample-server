@@ -26,29 +26,40 @@ class SampleDict(BaseModel):
 
 ALLOWED_EXTENSIONS = [".h5", ".hdf5"]
 SAMPLEDIR = Path(os.environ.get("SAMPLEDIR", "/events"))
-EVENT_FILENAMES = dict()
-for sample_set in SAMPLEDIR.iterdir():
-    if not sample_set.is_dir():
-        continue
-    for fname in sample_set.iterdir():
-        if fname.suffix not in ALLOWED_EXTENSIONS:
+
+def parse_events():
+    EVENT_FILENAMES = dict()
+    for sample_set in SAMPLEDIR.iterdir():
+        if not sample_set.is_dir():
             continue
-        name = re.findall(r"GW[\d]{6}_[\d]+", str(fname))[0]
-        EVENT_FILENAMES[name] = fname
-EVENTS = list(EVENT_FILENAMES.keys())
-EVENTS.sort()
-INJECTION_FILENAMES = dict()
-INJECTIONDIR = Path(os.environ.get("INJECTIONDIR", "/injections"))
-for sample_set in INJECTIONDIR.iterdir():
-    if not sample_set.is_dir():
-        continue
-    for fname in sample_set.iterdir():
-        if fname.suffix not in ALLOWED_EXTENSIONS:
+        for fname in sample_set.iterdir():
+            if fname.suffix not in ALLOWED_EXTENSIONS:
+                continue
+            name = re.findall(r"GW[\d]{6}_[\d]+", str(fname))[0]
+            EVENT_FILENAMES[name] = fname
+    EVENTS = list(EVENT_FILENAMES.keys())
+    EVENTS.sort()
+    return EVENTS, EVENT_FILENAMES
+
+
+def parse_injections():
+    INJECTION_FILENAMES = dict()
+    INJECTIONDIR = Path(os.environ.get("INJECTIONDIR", "/injections"))
+    for sample_set in INJECTIONDIR.iterdir():
+        if not sample_set.is_dir():
             continue
-        name = fname.name.split("-")[0]
-        INJECTION_FILENAMES[name] = fname
-INJECTION_FILES = list(INJECTION_FILENAMES.keys())
-INJECTION_FILES.sort()
+        for fname in sample_set.iterdir():
+            if fname.suffix not in ALLOWED_EXTENSIONS:
+                continue
+            name = fname.name.split("-")[0]
+            INJECTION_FILENAMES[name] = fname
+    INJECTION_FILES = list(INJECTION_FILENAMES.keys())
+    INJECTION_FILES.sort()
+    return INJECTION_FILES, INJECTION_FILENAMES
+
+
+EVENTS, EVENT_FILENAMES = parse_events()
+INJECTION_FILES, INJECTION_FILENAMES = parse_injections()
 
 
 @app.get("/events")
