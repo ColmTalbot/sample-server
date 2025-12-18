@@ -26,4 +26,5 @@ exec gunicorn "$APP_MODULE" \
     --timeout "$TIMEOUT" \
     --log-level "$LOG_LEVEL" \
     --access-logfile "$ACCESS_LOG" \
-    --error-logfile "$ERROR_LOG"
+    --error-logfile "$ERROR_LOG" \
+    --capture-output
