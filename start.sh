@@ -1,10 +1,13 @@
-BASEDIR=/home/sample-user/sample-container
+#!/bin/bash
+BASEDIR=/Users/colmtalbot/modules/sample-server
+
 docker run \
 	-d \
+	--env-file prod.env \
 	--restart always \
-	--name mycontainer \
-	-p 8081:8081 \
-	-v /home/sample-user/samples:/samples \
+	--name gwsaamplefind-server \
+	-p 8090:8080 \
+	-v /Users/colmtalbot/LVK_DATA:/samples \
 	-v $BASEDIR/run:/tmp/sockets \
-	-v $BASEDIR/logs:/tmp/log \
-	myimage
+	-v $BASEDIR/logs:/var/log \
+	gwsamplefind-server
